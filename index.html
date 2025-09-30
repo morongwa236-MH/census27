@@ -69,23 +69,23 @@
                 <div>
                     <label for="blockName" class="required-label block text-sm font-medium text-gray-700">Block Name</label>
                     <input type="text" id="blockName" name="blockName" required
-                           class="form-input">
+                            class="form-input">
                 </div>
 
                 <!-- Residential Address -->
                 <div>
                     <label for="residentialAddress" class="required-label block text-sm font-medium text-gray-700">Residential Address</label>
                     <textarea id="residentialAddress" name="residentialAddress" rows="2" required
-                              class="form-input"
-                              placeholder="Street, suburb, city"></textarea>
+                                 class="form-input"
+                                 placeholder="Street, suburb, city"></textarea>
                 </div>
 
                 <!-- Contact Number -->
                 <div>
                     <label for="contactNumber" class="required-label block text-sm font-medium text-gray-700">Main Member Contact Number</label>
                     <input type="tel" id="contactNumber" name="contactNumber" required
-                           class="form-input"
-                           placeholder="e.g., +1 555 123 4567">
+                            class="form-input"
+                            placeholder="e.g., +1 555 123 4567">
                 </div>
             </section>
 
@@ -136,6 +136,7 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // CRITICAL: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
+        // Ensure the URL ends with /exec
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwF7RJcjdX1mOYq40XFGCZvXB8zVjzXUwGMav5RWNt8Q59qcLfALdXhTAQf_Briz8E7/exec'; 
         
         let memberCount = 0;
@@ -146,7 +147,7 @@
         const submitButton = document.getElementById('submitButton');
         const statusMessage = document.getElementById('statusMessage');
 
-        // --- Templates ---
+        // --- Templates (Unchanged) ---
 
         /** Generates HTML for a single Adult Member section. */
         function getMemberTemplate(index, isMain = false) {
@@ -192,7 +193,7 @@
                             <label for="member-${index}-occupation" class="block text-sm font-medium text-gray-700">Occupation</label>
                             <input type="text" id="member-${index}-occupation" name="occupation" class="form-input">
                         </div>
-                         <div class="md:col-span-2">
+                        <div class="md:col-span-2">
                             <label for="member-${index}-churchActivities" class="block text-sm font-medium text-gray-700">Church Activities</label>
                             <input type="text" id="member-${index}-churchActivities" name="churchActivities" class="form-input">
                         </div>
@@ -331,11 +332,11 @@
                     <div><label for="${idBase}Location" class="block text-sm font-medium text-gray-600">Location of Church</label><input type="text" id="${idBase}Location" name="locationOfChurch" class="form-input-optional"></div>
                 `;
             } else if (section === 'Communion') {
-                 // Note: 'Church of 1st Communion' maps to 'churchFirstCommunion' in Sheet 
-                 detailFields = `
+                // Note: 'Church of 1st Communion' maps to 'churchFirstCommunion' in Sheet 
+                detailFields = `
                     <div><label for="${idBase}Date" class="block text-sm font-medium text-gray-600">Date of 1st Communion</label><input type="date" id="${idBase}Date" name="dateFirstCommunion" class="form-input-optional"></div>
                     <div><label for="${idBase}Church" class="block text-sm font-medium text-gray-600">Church of 1st Communion</label><input type="text" id="${idBase}Church" name="churchFirstCommunion" class="form-input-optional"></div>
-                 `;
+                `;
             }
 
             return `
@@ -351,7 +352,7 @@
                 </div>`;
         }
 
-        // --- Core Functions ---
+        // --- Core Functions (Unchanged or Minor) ---
 
         /** Toggles visibility of conditional fields based on 'Yes'/'No' selection. */
         function toggleConditionalFields(selectElement) {
@@ -410,9 +411,6 @@
             
             const section = button.closest(`.${type}-section`);
             section.remove();
-            
-            // Re-index remaining sections if necessary (optional for data collection, good for UI consistency)
-            // (Skipping re-indexing for brevity and performance, data collection relies on selectors)
         }
 
         /** Gathers data from a single element or section based on its children. */
@@ -439,7 +437,7 @@
             return { household, members, children };
         }
 
-        // --- Submission Logic ---
+        // --- UPDATED Submission Logic to use GET and URL Parameters ---
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -456,22 +454,35 @@
             submitButton.textContent = 'Saving data to Google Sheet...';
             statusMessage.classList.add('hidden');
 
-            // 2. Serialize complex data into JSON
+            // 2. Serialize complex data into a JSON string
             const payload = serializeFormData();
+            const jsonString = JSON.stringify(payload);
             
-            // 3. CRITICAL CORS FIX: Create FormData and append the JSON object as a string parameter named 'data'
-            const formData = new FormData();
-            formData.append('data', JSON.stringify(payload));
+            // 3. Encode the JSON string and append it as a 'data' URL parameter
+            const params = new URLSearchParams();
+            params.append('data', jsonString);
+            const url = WEB_APP_URL + '?' + params.toString(); // Apps Script URL + ?data={json_string}
             
             try {
-                // 4. Send data using fetch API with FormData
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    // IMPORTANT: Do NOT set Content-Type header.
-                    body: formData 
+                // 4. Send data using fetch API with GET method (CORS friendly)
+                // Note: Apps Script treats GET requests with parameters the same as form POSTs
+                const response = await fetch(url, {
+                    method: 'GET', // CRITICAL CHANGE: Use GET to avoid preflight issues
                 });
 
-                const result = await response.json();
+                // Since we are using doGet, the response might be a HTML redirect 
+                // or text output. We need to handle the content type carefully.
+                const responseText = await response.text();
+                let result;
+                try {
+                    // Try parsing as JSON first
+                    result = JSON.parse(responseText);
+                } catch (jsonError) {
+                    // Fallback if it's not JSON (e.g., if Apps Script returns text/html)
+                    console.error('Failed to parse JSON response. Response text:', responseText);
+                    throw new Error('Server returned an unparseable response.');
+                }
+                
 
                 // 5. Update UI based on result
                 if (result.success) {
@@ -512,7 +523,15 @@
             addSection('member', true); // Add the first main required member
             document.getElementById('addMemberBtn').addEventListener('click', () => addSection('member', false));
             document.getElementById('addChildBtn').addEventListener('click', () => addSection('child'));
+
+            // Set up listeners for initial state of conditional fields
+            document.querySelectorAll('select[onchange="toggleConditionalFields(this)"]').forEach(toggleConditionalFields);
         }
+        
+        // Expose function globally for use in HTML onclick/onchange attributes
+        window.removeSection = removeSection;
+        window.toggleConditionalFields = toggleConditionalFields;
+        window.calculateAge = calculateAge;
         
         // Start the form by adding the first required member on page load
         window.onload = initializeForm;
