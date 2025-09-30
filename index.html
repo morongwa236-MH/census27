@@ -3,539 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parish Household Registration</title>
-    <!-- Load Tailwind CSS and Inter font -->
+    <title>Parish Census Registration</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #6366f1;
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
-            scroll-behavior: smooth;
+            background-color: #f7f9fc;
         }
-        /* Style for required fields */
-        .required-label::after {
-            content: '*';
-            color: #ef4444; /* red-500 */
-            margin-left: 0.25rem;
+        .card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 10px -5px rgba(0, 0, 0, 0.04);
         }
-        /* Conditional field transition for smooth expansion/collapse */
-        .hidden-transition {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in;
+        .loading-spinner {
+            border-top-color: var(--primary);
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
         }
-        .hidden-transition.show {
-            max-height: 800px; /* Large enough to show all content */
-            opacity: 1;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        /* Custom input styling */
-        .form-input {
-            @apply mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition;
+        .section-header {
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .form-input-optional {
-            @apply mt-1 block w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-indigo-400 focus:border-indigo-400 transition;
+        .section-content {
+            transition: all 0.3s ease-in-out;
+        }
+        .member-section:not(:first-child), .child-section:not(:first-child) {
+            margin-top: 1.5rem;
+            border-top: 2px dashed #e5e7eb;
+            padding-top: 1.5rem;
         }
     </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#4f46e5', /* Indigo-600 */
-                        'primary-light': '#6366f1', /* Indigo-500 */
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="p-4 md:p-12">
+<body class="p-4 md:p-8 min-h-screen flex items-center justify-center">
 
-    <div class="w-full max-w-5xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-2xl border border-gray-100">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Parish Household Registration</h1>
-            <p class="text-md text-gray-500">Collect data for Household, Members, and Children for the church registry.</p>
-        </header>
+    <div class="w-full max-w-5xl card bg-white rounded-xl p-6 md:p-10">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2 text-center">Parish Household Census Submission</h1>
+        <form id="censusForm" class="space-y-8">
 
-        <form id="submissionForm" class="space-y-12">
-
-            <!-- HOUSEHOLD INFORMATION SECTION -->
-            <section class="p-6 bg-indigo-50 rounded-xl border-l-4 border-primary shadow-inner space-y-4">
-                <h2 class="text-2xl font-bold text-primary">1. Household Information (Main Contact)</h2>
-                
-                <!-- Block Name -->
-                <div>
-                    <label for="blockName" class="required-label block text-sm font-medium text-gray-700">Block Name</label>
-                    <input type="text" id="blockName" name="blockName" required
-                            class="form-input">
+            <!-- HOUSEHOLD DETAILS SECTION -->
+            <div id="householdSection" class="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4">1. Household Details</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="blockName" class="block text-sm font-medium text-gray-700">Block Name (e.g., St Monica)</label>
+                        <input type="text" id="blockName" name="blockName" required value="St Monica"
+                            class="mt-1 w-full p-3 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="residentialAddress" class="block text-sm font-medium text-gray-700">Residential Address</label>
+                        <input type="text" id="residentialAddress" name="residentialAddress" required value="15 SMME Village"
+                            class="mt-1 w-full p-3 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="contactNumber" class="block text-sm font-medium text-gray-700">Contact Number</label>
+                        <input type="tel" id="contactNumber" name="contactNumber" required value="0658833430"
+                            class="mt-1 w-full p-3 border border-indigo-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
                 </div>
-
-                <!-- Residential Address -->
-                <div>
-                    <label for="residentialAddress" class="required-label block text-sm font-medium text-gray-700">Residential Address</label>
-                    <textarea id="residentialAddress" name="residentialAddress" rows="2" required
-                                 class="form-input"
-                                 placeholder="Street, suburb, city"></textarea>
-                </div>
-
-                <!-- Contact Number -->
-                <div>
-                    <label for="contactNumber" class="required-label block text-sm font-medium text-gray-700">Main Member Contact Number</label>
-                    <input type="tel" id="contactNumber" name="contactNumber" required
-                            class="form-input"
-                            placeholder="e.g., +1 555 123 4567">
-                </div>
-            </section>
-
-            <!-- MEMBERS INFORMATION SECTION (DYNAMIC) -->
-            <div class="space-y-8">
-                <div class="bg-white pt-4 pb-2">
-                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 border-gray-200">2. Adult Members (Required: 1 Main Member)</h2>
-                </div>
-                <div id="membersContainer" class="space-y-10">
-                    <!-- Member templates will be added here by JavaScript -->
-                </div>
-                <button type="button" id="addMemberBtn"
-                        class="w-full flex items-center justify-center py-3 px-4 border border-dashed border-primary text-sm font-medium rounded-lg text-primary hover:bg-indigo-50 transition duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    Add Optional Adult Member
-                </button>
             </div>
 
-            <!-- CHILDREN INFORMATION SECTION (DYNAMIC) -->
-            <div class="space-y-8">
-                <div class="bg-white pt-4 pb-2">
-                    <h2 class="text-2xl font-bold text-gray-800 border-b pb-2 border-gray-200">3. Children Information</h2>
+            <!-- MEMBERS CONTAINER -->
+            <div id="membersContainer" class="p-6 rounded-xl border border-green-200 bg-green-50">
+                <h2 class="text-2xl font-bold text-green-700 mb-4">2. Adult Members (18+)</h2>
+                <!-- TEMPLATE FOR FIRST MEMBER (Head of Household) -->
+                <div class="member-section border border-green-300 p-4 rounded-lg bg-white" data-member-id="0">
+                    <h3 class="text-xl font-semibold text-green-800 mb-4">Member #1 (Head)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <input type="text" data-field="firstName" placeholder="First Name" required value="John"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <input type="text" data-field="lastName" placeholder="Last Name" required value="Doe"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <input type="date" data-field="dateOfBirth" placeholder="Date of Birth" required value="1999-03-30"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <input type="text" data-field="occupation" placeholder="Occupation" required value="Soldier"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    
+                    <!-- Ministries/Activities -->
+                    <div class="grid grid-cols-3 gap-4 mb-6 p-3 bg-gray-50 rounded-lg">
+                        <input type="text" data-field="churchActivities" placeholder="Church Activities (e.g., Choir)" value="Choir Conductor"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <input type="text" data-field="solidarityMinistry" placeholder="Solidarity/Ministry" value="None"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                        <input type="text" data-field="leadership" placeholder="Leadership Role" value="None"
+                            class="p-3 border rounded-lg focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    
+                    <!-- Sacraments & Status -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <select data-field="isCatholic" class="p-3 border rounded-lg">
+                            <option value="Yes" selected>Catholic? Yes</option>
+                            <option value="No">Catholic? No</option>
+                        </select>
+                        <select data-field="maritalStatus" class="p-3 border rounded-lg">
+                            <option value="Single" selected>Marital Status: Single</option>
+                            <option value="Married (Church)">Married (Church)</option>
+                            <option value="Married (Civil)">Married (Civil)</option>
+                            <option value="Divorced">Divorced</option>
+                        </select>
+                        <select data-field="isDivorced" class="p-3 border rounded-lg">
+                            <option value="No" selected>Divorced? No</option>
+                            <option value="Yes">Divorced? Yes</option>
+                        </select>
+                        <select data-field="isDikabelo" class="p-3 border rounded-lg">
+                            <option value="Yes" selected>Dikabelo? Yes</option>
+                            <option value="No">Dikabelo? No</option>
+                        </select>
+                    </div>
+
+                    <!-- Detailed Sacrament Fields -->
+                    <div class="space-y-4 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-md font-bold text-gray-700">Sacramental Details (Baptism, 1st Communion, Confirmation)</h4>
+                        
+                        <!-- Baptism -->
+                        <div class="grid grid-cols-5 gap-4">
+                            <select data-field="isBaptised" class="col-span-1 p-3 border rounded-lg">
+                                <option value="Yes" selected>Baptised? Yes</option>
+                                <option value="No">Baptised? No</option>
+                            </select>
+                            <input type="date" data-field="dateOfBaptism" placeholder="Date of Baptism" value="2000-01-01" class="col-span-1 p-3 border rounded-lg">
+                            <input type="text" data-field="churchOfBaptism" placeholder="Church of Baptism" value="St Fatima" class="col-span-1 p-3 border rounded-lg">
+                            <input type="text" data-field="baptismRegistrationNo" placeholder="Reg. No." value="12345" class="col-span-1 p-3 border rounded-lg">
+                            <input type="text" data-field="locationOfChurch" placeholder="Location of Church" value="Gaborone" class="col-span-1 p-3 border rounded-lg">
+                        </div>
+
+                        <!-- First Communion -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <select data-field="isFirstCommunion" class="p-3 border rounded-lg">
+                                <option value="Yes" selected>1st Communion? Yes</option>
+                                <option value="No">1st Communion? No</option>
+                            </select>
+                            <input type="date" data-field="dateFirstCommunion" placeholder="Date of 1st Communion" value="2007-05-15" class="p-3 border rounded-lg">
+                            <input type="text" data-field="churchFirstCommunion" placeholder="Church of 1st Communion" value="St Paul" class="p-3 border rounded-lg">
+                        </div>
+
+                        <!-- Confirmation -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <select data-field="isConfirmation" class="p-3 border rounded-lg">
+                                <option value="Yes" selected>Confirmation? Yes</option>
+                                <option value="No">Confirmation? No</option>
+                            </select>
+                            <input type="date" data-field="dateOfConfirmation" placeholder="Date of Confirmation" value="2012-10-20" class="p-3 border rounded-lg">
+                            <input type="text" data-field="churchOfConfirmation" placeholder="Church of Confirmation" value="Holy Cross" class="p-3 border rounded-lg">
+                        </div>
+
+                        <!-- Marriage Details -->
+                        <div class="grid grid-cols-3 gap-4">
+                            <input type="date" data-field="civilCourtMarriageDate" placeholder="Civil Marriage Date" class="p-3 border rounded-lg">
+                            <input type="date" data-field="churchMarriageDate" placeholder="Church Marriage Date" class="p-3 border rounded-lg">
+                            <input type="text" data-field="churchMarriagePlace" placeholder="Church Marriage Place" class="p-3 border rounded-lg">
+                            <input type="date" data-field="dateOfLastDikabelo" placeholder="Date of Last Dikabelo" value="2025-09-28" class="p-3 border rounded-lg">
+                        </div>
+
+                    </div>
+                    <!-- Remove button for dynamically added members (hidden on first member) -->
+                    <button type="button" class="remove-member-btn mt-4 hidden text-sm text-red-600 hover:text-red-800" onclick="removeSection(this)">
+                        Remove Member
+                    </button>
                 </div>
-                <div id="childrenContainer" class="space-y-10">
-                    <!-- Child templates will be added here by JavaScript -->
+
+                <!-- ADD MEMBER BUTTON -->
+                <div class="flex justify-center mt-6">
+                    <button type="button" id="addMemberBtn" onclick="addMember()"
+                        class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-150 shadow-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        Add Another Adult Member
+                    </button>
                 </div>
-                <button type="button" id="addChildBtn"
-                        class="w-full flex items-center justify-center py-3 px-4 border border-dashed border-green-600 text-sm font-medium rounded-lg text-green-600 hover:bg-green-50 transition duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    Add Child
-                </button>
             </div>
 
-            <!-- Submission Button -->
-            <div class="pt-8 border-t border-gray-200">
-                <button type="submit" id="submitButton"
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-xl text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-green-500 transition duration-300 transform hover:scale-[1.005] active:scale-95">
-                    Save All Household Data
-                </button>
+            <!-- CHILDREN CONTAINER -->
+            <div id="childrenContainer" class="p-6 rounded-xl border border-blue-200 bg-blue-50">
+                <h2 class="text-2xl font-bold text-blue-700 mb-4">3. Children (Under 18)</h2>
+                <!-- Template for Children (will be hidden and cloned) -->
+                <div id="childTemplate" class="child-section border border-blue-300 p-4 rounded-lg bg-white hidden" data-child-id="-1">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-4">Child #<span class="child-number"></span></h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <input type="text" data-field="firstName" placeholder="First Name" required class="p-3 border rounded-lg">
+                        <input type="text" data-field="lastName" placeholder="Last Name" required class="p-3 border rounded-lg">
+                        <input type="date" data-field="dateOfBirth" placeholder="Date of Birth" required class="p-3 border rounded-lg">
+                        <input type="text" data-field="age" placeholder="Age (approx)" required class="p-3 border rounded-lg">
+                    </div>
+                    
+                    <!-- Child Sacrament Details (Simplified) -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <select data-field="isCatholic" class="p-3 border rounded-lg">
+                            <option value="Yes" selected>Catholic? Yes</option>
+                            <option value="No">Catholic? No</option>
+                        </select>
+                        <select data-field="isBaptised" class="p-3 border rounded-lg">
+                            <option value="No" selected>Baptised? No</option>
+                            <option value="Yes">Baptised? Yes</option>
+                        </select>
+                        <select data-field="isFirstCommunion" class="p-3 border rounded-lg">
+                            <option value="No" selected>1st Communion? No</option>
+                            <option value="Yes">1st Communion? Yes</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="remove-child-btn mt-4 text-sm text-red-600 hover:text-red-800" onclick="removeSection(this)">
+                        Remove Child
+                    </button>
+                </div>
+
+                <div id="activeChildren" class="space-y-4">
+                    <!-- Dynamic children sections will be added here -->
+                </div>
+
+                <!-- ADD CHILD BUTTON -->
+                <div class="flex justify-center mt-6">
+                    <button type="button" id="addChildBtn" onclick="addChild()"
+                        class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-150 shadow-md flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Add Child
+                    </button>
+                </div>
             </div>
 
-            <!-- Status Message Area -->
-            <div id="statusMessage" class="mt-4 text-center p-3 rounded-lg hidden font-semibold"></div>
+
+            <!-- Submission Status Message -->
+            <div id="messageContainer" class="p-3 rounded-lg text-center hidden font-medium"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitButton" 
+                class="w-full py-3 px-4 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition duration-150 flex items-center justify-center disabled:opacity-50 shadow-lg shadow-indigo-500/50">
+                <span id="buttonText">Submit Full Census Data (via JSONP)</span>
+                <div id="loadingSpinner" class="hidden w-5 h-5 border-2 rounded-full loading-spinner border-b-transparent ml-2"></div>
+            </button>
         </form>
     </div>
 
-
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // CRITICAL: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL
-        // Ensure the URL ends with /exec
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby9XxD7xwBG9Fqa9R_LDr1xCo9kOGVBffReX0hMGDpsIBFPXExtoHW4-zw9b_S57sJm/exec'; 
+        // *** CRITICAL: REPLACE THIS WITH YOUR ACTUAL NEW WEB APP URL ***
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzFaDdA-wVG9DHYOOk4NP3vKrb9ELiTFmVsjiAPOf2sMqctLn0NUF36XGK7ArzqfzjM/exec'; 
         
-        let memberCount = 0;
-        let childCount = 0;
+        const form = document.getElementById('censusForm');
+        const messageContainer = document.getElementById('messageContainer');
+        const submitButton = document.getElementById('submitButton');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
         const membersContainer = document.getElementById('membersContainer');
         const childrenContainer = document.getElementById('childrenContainer');
-        const form = document.getElementById('submissionForm');
-        const submitButton = document.getElementById('submitButton');
-        const statusMessage = document.getElementById('statusMessage');
+        const childTemplate = document.getElementById('childTemplate');
+        const activeChildren = document.getElementById('activeChildren');
+        
+        let memberCount = 1;
+        let childCount = 0;
 
-        // --- Templates (Unchanged) ---
+        // --- 1. GLOBAL JSONP CALLBACK FUNCTION ---
+        window.handleResponse = function(response) {
+            console.log("Apps Script Response Received:", response);
+            
+            submitButton.disabled = false;
+            buttonText.textContent = 'Submit Full Census Data (via JSONP)';
+            loadingSpinner.classList.add('hidden');
 
-        /** Generates HTML for a single Adult Member section. */
-        function getMemberTemplate(index, isMain = false) {
-            const required = isMain ? 'required' : '';
-            const requiredClass = isMain ? 'required-label' : 'block';
-            const memberType = isMain ? ' (Main Contact)' : '';
-            const removeButton = isMain ? '' : `
-                <button type="button" data-index="${index}" onclick="removeSection(this, 'member')"
-                        class="text-red-500 hover:text-red-700 transition font-medium text-sm absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full p-1">
-                    Remove Member
-                </button>`;
-
-            return `
-                <div class="member-section p-6 bg-white border border-gray-200 rounded-xl shadow-lg space-y-4 relative" data-index="${index}">
-                    <h3 class="text-xl font-bold text-gray-800 pb-2 border-b mb-4">Member ${index + 1}${memberType}</h3>
-                    ${removeButton}
-
-                    <!-- Basic Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="member-${index}-firstName" class="${requiredClass} text-sm font-medium text-gray-700">First Name</label>
-                            <input type="text" id="member-${index}-firstName" name="firstName" ${required} class="form-input">
-                        </div>
-                        <div>
-                            <label for="member-${index}-lastName" class="${requiredClass} text-sm font-medium text-gray-700">Last Name</label>
-                            <input type="text" id="member-${index}-lastName" name="lastName" ${required} class="form-input">
-                        </div>
-                        <div>
-                            <label for="member-${index}-dob" class="${requiredClass} text-sm font-medium text-gray-700">Date of Birth</label>
-                            <input type="date" id="member-${index}-dob" name="dateOfBirth" ${required} class="form-input">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="member-${index}-catholic" class="${requiredClass} text-sm font-medium text-gray-700">Catholic?</label>
-                            <select id="member-${index}-catholic" name="isCatholic" ${required} class="form-input">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-1">
-                            <label for="member-${index}-occupation" class="block text-sm font-medium text-gray-700">Occupation</label>
-                            <input type="text" id="member-${index}-occupation" name="occupation" class="form-input">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="member-${index}-churchActivities" class="block text-sm font-medium text-gray-700">Church Activities</label>
-                            <input type="text" id="member-${index}-churchActivities" name="churchActivities" class="form-input">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="member-${index}-solidarity" class="block text-sm font-medium text-gray-700">Solidarity/Ministry</label>
-                            <input type="text" id="member-${index}-solidarity" name="solidarityMinistry" class="form-input">
-                        </div>
-                        <div>
-                            <label for="member-${index}-leadership" class="block text-sm font-medium text-gray-700">Leadership</label>
-                            <input type="text" id="member-${index}-leadership" name="leadership" class="form-input">
-                        </div>
-                    </div>
-
-                    <!-- SACRAMENTS SUB-SECTION -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg space-y-4 border border-gray-200">
-                        <h4 class="text-lg font-bold text-gray-700 border-b pb-2">Sacramental Information</h4>
-
-                        ${getSacramentFields('member', index, 'Baptised?', 'isBaptised', 'Baptism')}
-                        ${getSacramentFields('member', index, '1st Communion?', 'isFirstCommunion', 'Communion')}
-                        ${getSacramentFields('member', index, 'Confirmation?', 'isConfirmation', 'Confirmation')}
-                    </div>
-
-                    <!-- Marital Status & Dikabelo SUB-SECTION -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg space-y-4 border border-gray-200">
-                        <h4 class="text-lg font-bold text-gray-700 border-b pb-2">Marital & Financial Status</h4>
-                        
-                        <!-- Marital Status -->
-                        <div class="space-y-2">
-                            <label for="member-${index}-maritalStatus" class="block text-sm font-medium text-gray-700">Marital Status</label>
-                            <select id="member-${index}-maritalStatus" name="maritalStatus" class="form-input">
-                                <option value="Single">Single</option>
-                                <option value="Married">Married</option>
-                                <option value="Widow(er)">Widow(er)</option>
-                            </select>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                                <div><label for="member-${index}-civilDate" class="block text-sm font-medium text-gray-600">Civil Court Marriage Date (Optional)</label><input type="date" id="member-${index}-civilDate" name="civilCourtMarriageDate" class="form-input-optional"></div>
-                                <div><label for="member-${index}-churchDate" class="block text-sm font-medium text-gray-600">Church Marriage Date (Optional)</label><input type="date" id="member-${index}-churchDate" name="churchMarriageDate" class="form-input-optional"></div>
-                                <div class="md:col-span-2"><label for="member-${index}-churchPlace" class="block text-sm font-medium text-gray-600">Church Marriage Place (Optional)</label><input type="text" id="member-${index}-churchPlace" name="churchMarriagePlace" class="form-input-optional"></div>
-                            </div>
-                            
-                            <label for="member-${index}-divorced" class="block text-sm font-medium text-gray-700 mt-4">Divorced?</label>
-                            <select id="member-${index}-divorced" name="isDivorced" class="form-input">
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
-                            </select>
-                        </div>
-
-                        <!-- Dikabelo -->
-                        <div class="space-y-2 pt-4 border-t border-gray-200 mt-4">
-                            <label for="member-${index}-dikabelo" class="block text-sm font-medium text-gray-700">Dikabelo?</label>
-                            <select id="member-${index}-dikabelo" name="isDikabelo" onchange="toggleConditionalFields(this)" class="form-input">
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
-                            </select>
-                            <div data-conditional-id="member-${index}-dikabelo" class="hidden-transition space-y-2 pl-4 border-l-2 border-green-500/50">
-                                <div><label for="member-${index}-lastDikabeloDate" class="block text-sm font-medium text-gray-600">Date of Last Dikabelo</label><input type="date" id="member-${index}-lastDikabeloDate" name="dateOfLastDikabelo" class="form-input-optional"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-        }
-
-        /** Generates HTML for a single Child section. */
-        function getChildTemplate(index) {
-            return `
-                <div class="child-section p-6 bg-white border border-gray-200 rounded-xl shadow-lg space-y-4 relative" data-index="${index}">
-                    <h3 class="text-xl font-bold text-gray-800 pb-2 border-b mb-4">Child ${index + 1}</h3>
-                    <button type="button" data-index="${index}" onclick="removeSection(this, 'child')"
-                            class="text-red-500 hover:text-red-700 transition font-medium text-sm absolute top-4 right-4 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full p-1">
-                        Remove Child
-                    </button>
-
-                    <!-- Basic Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label for="child-${index}-firstName" class="required-label text-sm font-medium text-gray-700">First Name</label>
-                            <input type="text" id="child-${index}-firstName" name="firstName" required class="form-input">
-                        </div>
-                        <div>
-                            <label for="child-${index}-lastName" class="required-label text-sm font-medium text-gray-700">Last Name</label>
-                            <input type="text" id="child-${index}-lastName" name="lastName" required class="form-input">
-                        </div>
-                        <div>
-                            <label for="child-${index}-dob" class="required-label text-sm font-medium text-gray-700">Date of Birth</label>
-                            <input type="date" id="child-${index}-dob" name="dateOfBirth" required onchange="calculateAge(this, 'child-${index}-age')" class="form-input">
-                        </div>
-                        <div>
-                            <label for="child-${index}-age" class="required-label text-sm font-medium text-gray-700">Age</label>
-                            <input type="number" id="child-${index}-age" name="age" required readonly placeholder="Calculated" class="form-input bg-gray-100 cursor-not-allowed">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="child-${index}-catholic" class="required-label text-sm font-medium text-gray-700">Catholic?</label>
-                            <select id="child-${index}-catholic" name="isCatholic" required class="form-input">
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label for="child-${index}-churchActivities" class="block text-sm font-medium text-gray-700">Church Activities</label>
-                            <input type="text" id="child-${index}-churchActivities" name="churchActivities" class="form-input">
-                        </div>
-                    </div>
-
-                    <!-- SACRAMENTS SUB-SECTION (Children) -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-lg space-y-4 border border-gray-200">
-                        <h4 class="text-lg font-bold text-gray-700 border-b pb-2">Sacramental Information (Children)</h4>
-
-                        ${getSacramentFields('child', index, 'Baptised?', 'isBaptised', 'Baptism')}
-                        ${getSacramentFields('child', index, '1st Communion?', 'isFirstCommunion', 'Communion')}
-                        ${getSacramentFields('child', index, 'Confirmation?', 'isConfirmation', 'Confirmation')}
-                    </div>
-                </div>`;
-        }
-
-        /** Helper function to generate conditional sacrament fields */
-        function getSacramentFields(type, index, label, name, section) {
-            const idBase = `${type}-${index}-${name}`;
-            const dateName = `dateOf${section}`;
-            const churchName = `churchOf${section}`;
-
-            let detailFields = `
-                <div><label for="${idBase}Date" class="block text-sm font-medium text-gray-600">Date of ${section}</label><input type="date" id="${idBase}Date" name="${dateName}" class="form-input-optional"></div>
-                <div><label for="${idBase}Church" class="block text-sm font-medium text-gray-600">Church of ${section}</label><input type="text" id="${idBase}Church" name="${churchName}" class="form-input-optional"></div>
-            `;
-
-            if (section === 'Baptism') {
-                detailFields += `
-                    <div><label for="${idBase}RegNo" class="block text-sm font-medium text-gray-600">Registration Number</label><input type="text" id="${idBase}RegNo" name="baptismRegistrationNo" class="form-input-optional"></div>
-                    <div><label for="${idBase}Location" class="block text-sm font-medium text-gray-600">Location of Church</label><input type="text" id="${idBase}Location" name="locationOfChurch" class="form-input-optional"></div>
-                `;
-            } else if (section === 'Communion') {
-                // Note: 'Church of 1st Communion' maps to 'churchFirstCommunion' in Sheet 
-                detailFields = `
-                    <div><label for="${idBase}Date" class="block text-sm font-medium text-gray-600">Date of 1st Communion</label><input type="date" id="${idBase}Date" name="dateFirstCommunion" class="form-input-optional"></div>
-                    <div><label for="${idBase}Church" class="block text-sm font-medium text-gray-600">Church of 1st Communion</label><input type="text" id="${idBase}Church" name="churchFirstCommunion" class="form-input-optional"></div>
-                `;
-            }
-
-            return `
-                <div class="space-y-2">
-                    <label for="${idBase}" class="block text-sm font-medium text-gray-700">${label}</label>
-                    <select id="${idBase}" name="${name}" onchange="toggleConditionalFields(this)" class="form-input">
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                    </select>
-                    <div data-conditional-id="${idBase}" class="hidden-transition space-y-2 pl-4 border-l-2 border-indigo-400/50 mt-2">
-                        ${detailFields}
-                    </div>
-                </div>`;
-        }
-
-        // --- Core Functions (Unchanged or Minor) ---
-
-        /** Toggles visibility of conditional fields based on 'Yes'/'No' selection. */
-        function toggleConditionalFields(selectElement) {
-            const container = document.querySelector(`[data-conditional-id="${selectElement.id}"]`);
-            if (container) {
-                if (selectElement.value === 'Yes') {
-                    container.classList.add('show');
-                } else {
-                    container.classList.remove('show');
-                    // Optionally clear fields when hidden to avoid sending empty data
-                    container.querySelectorAll('input, select').forEach(input => input.value = input.type === 'date' ? '' : '');
-                }
-            }
-        }
-
-        /** Calculates age from Date of Birth input and updates the age field. */
-        function calculateAge(dobInput, ageInputId) {
-            const dob = new Date(dobInput.value);
-            const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const m = today.getMonth() - dob.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-                age--;
-            }
-            document.getElementById(ageInputId).value = age >= 0 ? age : 0;
-        }
-
-        /** Adds a new dynamic section (Member or Child) to the form. */
-        function addSection(type, isMain = false) {
-            let container, templateFunction, newIndex;
-
-            if (type === 'member') {
-                container = membersContainer;
-                templateFunction = getMemberTemplate;
-                newIndex = memberCount++;
-            } else if (type === 'child') {
-                container = childrenContainer;
-                templateFunction = getChildTemplate;
-                newIndex = childCount++;
+            if (response.success) {
+                showMessage('Data successfully saved to Google Sheet! ID: ' + response.message.split(': ')[1], 'bg-green-100 text-green-700 border border-green-300');
             } else {
-                return;
-            }
-
-            const newSectionWrapper = document.createElement('div');
-            newSectionWrapper.innerHTML = templateFunction(newIndex, isMain);
-            container.appendChild(newSectionWrapper.firstElementChild);
-        }
-
-        /** Removes a dynamic section. */
-        function removeSection(button, type) {
-            if (type === 'member' && membersContainer.children.length === 1) {
-                // Prevent removing the last, required member
-                displayStatus('You must keep at least one main adult member.', 'bg-yellow-100 text-yellow-800');
-                return;
+                showMessage('Submission failed: ' + response.message, 'bg-red-100 text-red-700 border border-red-300');
             }
             
-            const section = button.closest(`.${type}-section`);
-            section.remove();
+            const scriptTag = document.getElementById('jsonpScript');
+            if (scriptTag) scriptTag.remove();
+        };
+
+        // Helper to display messages
+        function showMessage(message, classes) {
+            messageContainer.textContent = message;
+            messageContainer.className = `p-3 rounded-lg text-center ${classes} font-medium`;
+            messageContainer.classList.remove('hidden');
         }
 
-        /** Gathers data from a single element or section based on its children. */
-        function getSectionData(sectionElement) {
+        // Helper to collect data from a specific section (member or child)
+        function collectSectionData(section) {
             const data = {};
-            const inputs = sectionElement.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                if (input.name) {
-                    data[input.name] = input.value.trim() || '';
-                }
+            // Find all elements with a data-field attribute within the section
+            const fields = section.querySelectorAll('[data-field]');
+            fields.forEach(field => {
+                const key = field.dataset.field;
+                // Use value for input/select, default to empty string
+                data[key] = field.value || "";
             });
             return data;
         }
 
-        /** Gathers all form data into a single JSON object for submission. */
-        function serializeFormData() {
-            // Household data is collected from the top-level section
-            const household = getSectionData(document.querySelector('section'));
-            
-            // Members and Children data are collected from dynamic containers
-            const members = Array.from(membersContainer.querySelectorAll('.member-section')).map(getSectionData);
-            const children = Array.from(childrenContainer.querySelectorAll('.child-section')).map(getSectionData);
+        // --- 2. DYNAMIC SECTION LOGIC ---
 
-            return { household, members, children };
+        function addMember() {
+            const memberSection = membersContainer.querySelector('.member-section');
+            if (!memberSection) return; // Should not happen
+
+            // Clone the first member section
+            const newMember = memberSection.cloneNode(true);
+            memberCount++;
+
+            // Update header text and remove button visibility
+            newMember.querySelector('h3').textContent = `Member #${memberCount}`;
+            newMember.querySelector('.remove-member-btn').classList.remove('hidden');
+
+            // Clear all input values in the cloned section
+            newMember.querySelectorAll('[data-field]').forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    input.checked = false;
+                } else if (input.tagName === 'SELECT') {
+                    // Reset selects to the first option (usually "No" or "Single")
+                    input.selectedIndex = 0; 
+                } else {
+                    input.value = '';
+                }
+            });
+
+            // Append to the container
+            membersContainer.insertBefore(newMember, membersContainer.querySelector('#addMemberBtn').closest('div'));
         }
 
-        // --- UPDATED Submission Logic to use GET and URL Parameters ---
+        function addChild() {
+            // Clone the hidden template
+            const newChild = childTemplate.cloneNode(true);
+            childCount++;
 
-        form.addEventListener('submit', async function(e) {
+            newChild.dataset.childId = childCount;
+            newChild.id = `child-${childCount}`;
+            newChild.classList.remove('hidden');
+            
+            // Update header text
+            newChild.querySelector('.child-number').textContent = childCount;
+            
+            // Clear all input values
+            newChild.querySelectorAll('[data-field]').forEach(input => input.value = '');
+
+            // Append to the active children container
+            activeChildren.appendChild(newChild);
+        }
+        
+        function removeSection(button) {
+            const section = button.closest('.member-section') || button.closest('.child-section');
+            if (section) {
+                // Check if we are removing the last child
+                if (section.classList.contains('child-section')) {
+                    childCount--;
+                    // Re-index children labels after removal
+                    document.querySelectorAll('#activeChildren .child-section:not(.hidden)').forEach((el, index) => {
+                        el.querySelector('.child-number').textContent = index + 1;
+                    });
+                }
+                section.remove();
+            }
+        }
+
+        // --- 3. FORM SUBMISSION HANDLER ---
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Quick validation for required main member fields
-            const mainMemberFirstName = document.getElementById('member-0-firstName')?.value;
-            if (!mainMemberFirstName || !document.getElementById('blockName').value) {
-                displayStatus('Please fill in all required fields for Household and the Main Adult Member.', 'bg-red-100 text-red-800');
-                return;
-            }
-
-            // 1. Prepare UI for submission
+            // Reset state
             submitButton.disabled = true;
-            submitButton.textContent = 'Saving data to Google Sheet...';
-            statusMessage.classList.add('hidden');
+            buttonText.textContent = 'Submitting...';
+            loadingSpinner.classList.remove('hidden');
+            messageContainer.classList.add('hidden');
 
-            // 2. Serialize complex data into a JSON string
-            const payload = serializeFormData();
-            const jsonString = JSON.stringify(payload);
-            
-            // 3. Encode the JSON string and append it as a 'data' URL parameter
-            const params = new URLSearchParams();
-            params.append('data', jsonString);
-            const url = WEB_APP_URL + '?' + params.toString(); // Apps Script URL + ?data={json_string}
-            
-            try {
-                // 4. Send data using fetch API with GET method (CORS friendly)
-                // Note: Apps Script treats GET requests with parameters the same as form POSTs
-                const response = await fetch(url, {
-                    method: 'GET', // CRITICAL CHANGE: Use GET to avoid preflight issues
-                });
+            // 1. Household Data
+            const householdData = {
+                blockName: document.getElementById('blockName').value,
+                residentialAddress: document.getElementById('residentialAddress').value,
+                contactNumber: document.getElementById('contactNumber').value
+            };
 
-                // Since we are using doGet, the response might be a HTML redirect 
-                // or text output. We need to handle the content type carefully.
-                const responseText = await response.text();
-                let result;
-                try {
-                    // Try parsing as JSON first
-                    result = JSON.parse(responseText);
-                } catch (jsonError) {
-                    // Fallback if it's not JSON (e.g., if Apps Script returns text/html)
-                    console.error('Failed to parse JSON response. Response text:', responseText);
-                    throw new Error('Server returned an unparseable response.');
-                }
+            // 2. Members Data
+            const members = [];
+            document.querySelectorAll('.member-section').forEach(section => {
+                // Only collect data if the section is visible (i.e., not a template)
+                if (section.classList.contains('hidden')) return;
                 
+                const member = collectSectionData(section);
+                members.push(member);
+            });
 
-                // 5. Update UI based on result
-                if (result.success) {
-                    displayStatus(result.message, 'bg-green-100 text-green-800');
-                    // Reset form after a successful submission
-                    setTimeout(() => form.reset(), 500); 
-                    // Re-initialize dynamic sections
-                    setTimeout(() => {
-                        membersContainer.innerHTML = '';
-                        childrenContainer.innerHTML = '';
-                        memberCount = 0;
-                        childCount = 0;
-                        initializeForm();
-                    }, 600);
-                } else {
-                    displayStatus('Error: ' + result.message, 'bg-red-100 text-red-800');
+            // 3. Children Data
+            const children = [];
+            document.querySelectorAll('#activeChildren .child-section').forEach(section => {
+                const child = collectSectionData(section);
+                children.push(child);
+            });
+
+
+            const data = {
+                household: householdData,
+                members: members,
+                children: children
+            };
+            
+            console.log("Payload to send:", data);
+
+            const dataString = JSON.stringify(data);
+            
+            // Construct the final JSONP URL
+            const finalUrl = `${scriptUrl}?data=${encodeURIComponent(dataString)}&callback=handleResponse`;
+
+            // JSONP IMPLEMENTATION (Bypasses CORS)
+            const script = document.createElement('script');
+            script.src = finalUrl;
+            script.id = 'jsonpScript'; 
+            document.head.appendChild(script);
+
+            // Set a timeout for error handling
+            setTimeout(() => {
+                if (submitButton.disabled) {
+                    window.handleResponse({ 
+                        success: false, 
+                        message: 'Connection timed out or failed to execute script.' 
+                    });
                 }
-
-            } catch (error) {
-                console.error('Submission failed:', error);
-                displayStatus('Submission failed! Please check your WEB_APP_URL and network connection.', 'bg-red-100 text-red-800');
-            } finally {
-                // 6. Reset button state
-                submitButton.disabled = false;
-                submitButton.textContent = 'Save All Household Data';
-            }
+            }, 20000); 
         });
-
-        /** Utility function to display status messages. */
-        function displayStatus(message, classes) {
-            statusMessage.textContent = message;
-            statusMessage.className = `mt-4 text-center p-3 rounded-lg ${classes} font-semibold shadow-inner`;
-            statusMessage.classList.remove('hidden');
-        }
-
-        /** Initializes the form with the first required member. */
-        function initializeForm() {
-            addSection('member', true); // Add the first main required member
-            document.getElementById('addMemberBtn').addEventListener('click', () => addSection('member', false));
-            document.getElementById('addChildBtn').addEventListener('click', () => addSection('child'));
-
-            // Set up listeners for initial state of conditional fields
-            document.querySelectorAll('select[onchange="toggleConditionalFields(this)"]').forEach(toggleConditionalFields);
-        }
-        
-        // Expose function globally for use in HTML onclick/onchange attributes
-        window.removeSection = removeSection;
-        window.toggleConditionalFields = toggleConditionalFields;
-        window.calculateAge = calculateAge;
-        
-        // Start the form by adding the first required member on page load
-        window.onload = initializeForm;
-
     </script>
 </body>
 </html>
