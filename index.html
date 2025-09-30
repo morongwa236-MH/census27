@@ -1,243 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Lady of Fatima Shrine - Household Form</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>Fatima Shrine Census</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <header>
-        <h1>Our Lady of Fatima Shrine</h1>
-        <h2>Household Membership Form</h2>
-    </header>
-    <main>
-        <form id="householdForm">
-            <fieldset class="form-section">
-                <legend>Household Information</legend>
-                <div class="form-group">
-                    <label for="block_name">Block Name:</label>
-                    <input type="text" id="block_name" name="block_name" required>
-                </div>
-                <div class="form-group">
-                    <label for="residential_address">Residential Address:</label>
-                    <input type="text" id="residential_address" name="residential_address" required>
-                </div>
-                <div class="form-group">
-                    <label for="contact_number">Main Member's Contact No.:</label>
-                    <input type="tel" id="contact_number" name="contact_number" required>
-                </div>
-            </fieldset>
+<body class="bg-light">
 
-            <fieldset class="form-section">
-                <legend>Members Information</legend>
-                <div id="members-container">
-                    </div>
-                <button type="button" id="add-member-btn" class="add-btn">+ Add Member</button>
-            </fieldset>
+  <div class="container py-4">
+    <h1 class="mb-4 text-center">Our Lady of Fatima Shrine – Census Form</h1>
 
-            <fieldset class="form-section">
-                <legend>Children Information</legend>
-                <div id="children-container">
-                    </div>
-                <button type="button" id="add-child-btn" class="add-btn">+ Add Child</button>
-            </fieldset>
-
-            <button type="submit" class="submit-btn">Submit Form</button>
-        </form>
-    </main>
-
-    <template id="member-template">
-        <div class="person-form member-form">
-            <h3>Member <span class="member-number">1</span></h3>
-            <button type="button" class="remove-btn">Remove</button>
-            <div class="form-group">
-                <label>First Name:</label>
-                <input type="text" name="member_first_name" required>
-            </div>
-            <div class="form-group">
-                <label>Last Name:</label>
-                <input type="text" name="member_last_name" required>
-            </div>
-            <div class="form-group">
-                <label>Date of Birth:</label>
-                <input type="date" name="member_dob" required>
-            </div>
-            <div class="form-group">
-                <label>Catholic?:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="member_catholic" value="Yes" required> Yes</label>
-                    <label><input type="radio" name="member_catholic" value="No"> No</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Occupation:</label>
-                <input type="text" name="member_occupation">
-            </div>
-            <div class="form-group">
-                <label>Church Activities:</label>
-                <input type="text" name="member_activities">
-            </div>
-            <div class="form-group">
-                <label>Solidarity/Ministry:</label>
-                <input type="text" name="member_ministry">
-            </div>
-            <div class="form-group">
-                <label>Leadership:</label>
-                <input type="text" name="member_leadership">
-            </div>
-            
-            <div class="sub-section">
-                <h4>Sacraments</h4>
-                <div class="sacrament-group">
-                    <label>Baptised?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="member_baptised" value="Yes"> Yes</label>
-                        <label><input type="radio" name="member_baptised" value="No"> No</label>
-                    </div>
-                    <div class="sacrament-details" style="display:none;">
-                        <label>Date of Baptism:</label><input type="date" name="member_baptism_date">
-                        <label>Registration Number:</label><input type="text" name="member_baptism_reg_no">
-                        <label>Church of Baptism:</label><input type="text" name="member_baptism_church">
-                        <label>Location of Church:</label><input type="text" name="member_baptism_location">
-                    </div>
-                </div>
-                
-                <div class="sacrament-group">
-                    <label>1st Communion?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="member_communion" value="Yes"> Yes</label>
-                        <label><input type="radio" name="member_communion" value="No"> No</label>
-                    </div>
-                    <div class="sacrament-details" style="display:none;">
-                        <label>Date 1st Communion:</label><input type="date" name="member_communion_date">
-                        <label>Church of 1st Communion:</label><input type="text" name="member_communion_church">
-                    </div>
-                </div>
-
-                <div class="sacrament-group">
-                    <label>Confirmation?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="member_confirmation" value="Yes"> Yes</label>
-                        <label><input type="radio" name="member_confirmation" value="No"> No</label>
-                    </div>
-                    <div class="sacrament-details" style="display:none;">
-                        <label>Date of Confirmation:</label><input type="date" name="member_confirmation_date">
-                        <label>Church of Confirmation:</label><input type="text" name="member_confirmation_church">
-                    </div>
-                </div>
-            </div>
-
-            <div class="sub-section">
-                <h4>Marital & Dikabelo Status</h4>
-                <div class="form-group">
-                    <label>Marital Status:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="member_marital_status" value="Single"> Single</label>
-                        <label><input type="radio" name="member_marital_status" value="Married"> Married</label>
-                        <label><input type="radio" name="member_marital_status" value="Widow[er]"> Widow[er]</label>
-                    </div>
-                </div>
-                <div class="form-group marital-details" style="display:none;">
-                    <label>Civil Court Marriage Date:</label><input type="date" name="member_civil_date">
-                    <label>Church Marriage Date:</label><input type="date" name="member_church_date">
-                    <label>Church Marriage Place:</label><input type="text" name="member_church_place">
-                </div>
-                <div class="form-group">
-                    <label>Divorced?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="member_divorced" value="Yes"> Yes</label>
-                        <label><input type="radio" name="member_divorced" value="No"> No</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Dikabelo?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="member_dikabelo" value="Yes"> Yes</label>
-                        <label><input type="radio" name="member_dikabelo" value="No"> No</label>
-                    </div>
-                    <div class="dikabelo-details" style="display:none;">
-                        <label>Date of Last Dikabelo:</label><input type="date" name="member_dikabelo_date">
-                    </div>
-                </div>
-            </div>
+    <!-- Household Section -->
+    <div class="card mb-4">
+      <div class="card-header">Household Information</div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Block Name</label>
+          <input type="text" id="blockName" class="form-control" required />
         </div>
-    </template>
-    
-    <template id="child-template">
-        <div class="person-form child-form">
-            <h3>Child <span class="child-number">1</span></h3>
-            <button type="button" class="remove-btn">Remove</button>
-            <div class="form-group">
-                <label>First Name:</label>
-                <input type="text" name="child_first_name" required>
-            </div>
-            <div class="form-group">
-                <label>Last Name:</label>
-                <input type="text" name="child_last_name" required>
-            </div>
-            <div class="form-group">
-                <label>Date of Birth:</label>
-                <input type="date" name="child_dob" required>
-            </div>
-            <div class="form-group">
-                <label>Age:</label>
-                <input type="number" name="child_age" required>
-            </div>
-            <div class="form-group">
-                <label>Catholic?:</label>
-                <div class="radio-group">
-                    <label><input type="radio" name="child_catholic" value="Yes" required> Yes</label>
-                    <label><input type="radio" name="child_catholic" value="No"> No</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>Church Activities:</label>
-                <input type="text" name="child_activities">
-            </div>
-            
-            <div class="sub-section">
-                <h4>Sacraments</h4>
-                <div class="sacrament-group">
-                    <label>Baptised?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="child_baptised" value="Yes"> Yes</label>
-                        <label><input type="radio" name="child_baptised" value="No"> No</label>
-                    </div>
-                    <div class="sacrament-details" style="display:none;">
-                        <label>Date of Baptism:</label><input type="date" name="child_baptism_date">
-                        <label>Registration Number:</label><input type="text" name="child_baptism_reg_no">
-                        <label>Church of Baptism:</label><input type="text" name="child_baptism_church">
-                        <label>Location of Church:</label><input type="text" name="child_baptism_location">
-                    </div>
-                </div>
-
-                <div class="sacrament-group">
-                    <label>1st Communion?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="child_communion" value="Yes"> Yes</label>
-                        <label><input type="radio" name="child_communion" value="No"> No</label>
-                    </div>
-                    <div class="sacrament-details" style="display:none;">
-                        <label>Date 1st Communion:</label><input type="date" name="child_communion_date">
-                        <label>Church of 1st Communion:</label><input type="text" name="child_communion_church">
-                    </div>
-                </div>
-                
-                <div class="sacrament-group">
-                    <label>Confirmation?:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="child_confirmation" value="Yes"> Yes</label>
-                        <label><input type="radio" name="child_confirmation" value="No"> No</label>
-                    </div>
-                    <div class="sacrament-details" style="display:none;">
-                        <label>Date of Confirmation:</label><input type="date" name="child_confirmation_date">
-                        <label>Church of Confirmation:</label><input type="text" name="child_confirmation_church">
-                    </div>
-                </div>
-            </div>
+        <div class="mb-3">
+          <label class="form-label">Residential Address</label>
+          <input type="text" id="address" class="form-control" required />
         </div>
-    </template>
-    <script src="script.js"></script>
+        <div class="mb-3">
+          <label class="form-label">Contact Info</label>
+          <input type="text" id="contact" class="form-control" required />
+        </div>
+      </div>
+    </div>
+
+    <!-- Members Section -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Members</span>
+        <button type="button" class="btn btn-sm btn-primary" onclick="addMember()">+ Add Member</button>
+      </div>
+      <div class="card-body" id="members"></div>
+    </div>
+
+    <!-- Children Section -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Children</span>
+        <button type="button" class="btn btn-sm btn-primary" onclick="addChild()">+ Add Child</button>
+      </div>
+      <div class="card-body" id="children"></div>
+    </div>
+
+    <!-- Submit -->
+    <div class="text-center">
+      <button type="button" class="btn btn-success btn-lg" onclick="submitForm()">Submit Census</button>
+    </div>
+
+    <div class="mt-3 text-center">
+      <p id="status"></p>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxlqYD7EDT5_Td9vAuvGCgt5yKl2c4bDu6qcGuwF-3SzAySbeDYUhJyZz3HzjBmKVe7/exec"; // replace with your deployed script URL
+
+    function memberTemplate() {
+      return `
+        <div class="member border rounded p-3 mb-3 bg-white">
+          <h5>Member</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input type="text" name="firstName" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" name="lastName" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" name="dateOfBirth" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Catholic?</label>
+              <select name="catholic" class="form-select">
+                <option value="">--</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Occupation</label>
+              <input type="text" name="occupation" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Church Activities</label>
+              <input type="text" name="churchActivities" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Solidarity/Ministry</label>
+              <input type="text" name="sodality" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Leadership</label>
+              <input type="text" name="leadership" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Baptised?</label>
+            <select name="baptised" class="form-select" onchange="toggleOptional(this,'baptism')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="baptism-optional mt-2" style="display:none">
+              <label class="form-label">Date of Baptism</label>
+              <input type="date" name="baptismDate" class="form-control">
+              <label class="form-label">Registration Number</label>
+              <input type="text" name="baptismRegNo" class="form-control">
+              <label class="form-label">Church of Baptism</label>
+              <input type="text" name="baptismChurch" class="form-control">
+              <label class="form-label">Location of Church</label>
+              <input type="text" name="baptismLocation" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">1st Communion?</label>
+            <select name="firstCommunion" class="form-select" onchange="toggleOptional(this,'communion')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="communion-optional mt-2" style="display:none">
+              <label class="form-label">Date 1st Communion</label>
+              <input type="date" name="firstCommunionDate" class="form-control">
+              <label class="form-label">Church of 1st Communion</label>
+              <input type="text" name="firstCommunionChurch" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Confirmation?</label>
+            <select name="confirmed" class="form-select" onchange="toggleOptional(this,'confirmation')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="confirmation-optional mt-2" style="display:none">
+              <label class="form-label">Date of Confirmation</label>
+              <input type="date" name="confirmationDate" class="form-control">
+              <label class="form-label">Church of Confirmation</label>
+              <input type="text" name="confirmationChurch" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Marital Status</label>
+            <select name="maritalStatus" class="form-select">
+              <option value="">--</option><option>Single</option><option>Married</option><option>Widow</option><option>Widower</option>
+            </select>
+            <label class="form-label">Civil Court Marriage Date</label>
+            <input type="date" name="civilMarriageDate" class="form-control">
+            <label class="form-label">Church Marriage Date</label>
+            <input type="date" name="churchMarriageDate" class="form-control">
+            <label class="form-label">Church Marriage Place</label>
+            <input type="text" name="churchMarriagePlace" class="form-control">
+            <label class="form-label">Divorced</label>
+            <select name="divorced" class="form-select">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Dikabelo?</label>
+            <select name="dikabelo" class="form-select" onchange="toggleOptional(this,'dikabelo')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="dikabelo-optional mt-2" style="display:none">
+              <label class="form-label">Date of Last Dikabelo</label>
+              <input type="date" name="dikabeloDate" class="form-control">
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function childTemplate() {
+      return `
+        <div class="child border rounded p-3 mb-3 bg-white">
+          <h5>Child</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input type="text" name="firstName" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" name="lastName" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" name="dateOfBirth" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Age</label>
+              <input type="number" name="age" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Catholic?</label>
+              <select name="catholic" class="form-select">
+                <option value="">--</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Church Activities</label>
+              <input type="text" name="churchActivities" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Baptised?</label>
+            <select name="baptised" class="form-select" onchange="toggleOptional(this,'baptism')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="baptism-optional mt-2" style="display:none">
+              <label class="form-label">Date of Baptism</label>
+              <input type="date" name="baptismDate" class="form-control">
+              <label class="form-label">Registration Number</label>
+              <input type="text" name="baptismRegNo" class="form-control">
+              <label class="form-label">Church of Baptism</label>
+              <input type="text" name="baptismChurch" class="form-control">
+              <label class="form-label">Location of Church</label>
+              <input type="text" name="baptismLocation" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">1st Communion?</label>
+            <select name="firstCommunion" class="form-select" onchange="toggleOptional(this,'communion')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="communion-optional mt-2" style="display:none">
+              <label class="form-label">Date 1st Communion</label>
+              <input type="date" name="firstCommunionDate" class="form-control">
+              <label class="form-label">Church of 1st Communion</label>
+              <input type="text" name="firstCommunionChurch" class="form-control">
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="form-label">Confirmation?</label>
+            <select name="confirmed" class="form-select" onchange="toggleOptional(this,'confirmation')">
+              <option value="">--</option><option>Yes</option><option>No</option>
+            </select>
+            <div class="confirmation-optional mt-2" style="display:none">
+              <label class="form-label">Date of Confirmation</label>
+              <input type="date" name="confirmationDate" class="form-control">
+              <label class="form-label">Church of Confirmation</label>
+              <input type="text" name="confirmationChurch" class="form-control">
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function addMember() {
+      document.getElementById("members").insertAdjacentHTML("beforeend", memberTemplate());
+    }
+    function addChild() {
+      document.getElementById("children").insertAdjacentHTML("beforeend", childTemplate());
+    }
+
+    function toggleOptional(select, type) {
+      const parent = select.closest("div");
+      const section = parent.querySelector("." + type + "-optional");
+      if (section) section.style.display = (select.value === "Yes") ? "block" : "none";
+    }
+
+    function collectSection(className) {
+      const items = [];
+      document.querySelectorAll("." + className).forEach(div => {
+        const obj = {};
+        div.querySelectorAll("input, select").forEach(input => {
+          obj[input.name] = input.value;
+        });
+        items.push(obj);
+      });
+      return items;
+    }
+
+    function submitForm() {
+      const household = {
+        blockName: document.getElementById("blockName").value,
+        address: document.getElementById("address").value,
+        contact: document.getElementById("contact").value
+      };
+      const members = collectSection("member");
+      const children = collectSection("child");
+
+      const payload = { household, members, children };
+
+      const statusEl = document.getElementById("status");
+      statusEl.textContent = "Submitting...";
+      statusEl.className = "";
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          statusEl.textContent = "✅ " + data.message;
+          statusEl.className = "text-success fw-bold";
+        } else {
+          statusEl.textContent = "❌ " + JSON.stringify(data.errors || data.message);
+          statusEl.className = "text-danger fw-bold";
+        }
+      })
+      .catch(err => {
+        statusEl.textContent = "❌ " + err.message;
+        statusEl.className = "text-danger fw-bold";
+      });
+    }
+  </script>
 </body>
 </html>
